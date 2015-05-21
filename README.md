@@ -1,4 +1,4 @@
-# FlyingBird_Cocos2dx
+# Flying Bird Cocos2d-x
 A "Flappy Bird" clone developed using Cocos2d-x. Targeting Windows 10 UAP.
 
 How to build
@@ -24,3 +24,7 @@ How to build
          $ git submodule update --init
          
 5. Open `proj.win10/FlyingBird_Cocos2dx.sln` to build and run.
+
+Artwork
+-------
+From Matthias Gall, available at https://github.com/digitalbreed.
