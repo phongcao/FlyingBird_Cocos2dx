@@ -65,24 +65,18 @@ bool Game::init()
 
 void Game::InitGroundAndSkyline()
 {
-	// Ground
 	Size visibleSize = Director::getInstance()->getVisibleSize();
-	m_sprGround = SpriteBatchNode::create("ground.png");
-	m_sprGround->getTexture()->setAliasTexParameters();
-	Size groundTexSize = m_sprGround->getTexture()->getContentSizeInPixels();
-	int groundX = 0;
+	Texture2D::TexParams texParams = { GL_NEAREST_MIPMAP_NEAREST, GL_NEAREST_MIPMAP_NEAREST, GL_REPEAT, GL_CLAMP_TO_EDGE };
 
-	do
-	{
-		Sprite* sprGroundElement = Sprite::createWithTexture(m_sprGround->getTexture());
-		sprGroundElement->setAnchorPoint(Vec2(0, 0));
-		sprGroundElement->setPosition(groundX, 0);
-		m_sprGround->addChild(sprGroundElement);
-		groundX += groundTexSize.width;
-	} 
-	while (groundX < visibleSize.width + groundTexSize.width);
+	// Ground
+	Texture2D* groundTexture = Director::getInstance()->getTextureCache()->addImage("ground.png");
+	Size groundTextureSize = groundTexture->getContentSizeInPixels();
+	groundTexture->generateMipmap();
+	groundTexture->setTexParameters(&texParams);
+	m_sprGround = Sprite::createWithTexture(groundTexture, Rect(0, 0, visibleSize.width + groundTextureSize.width, groundTextureSize.height));
+	m_sprGround->setAnchorPoint(Vec2(0, 0));
 
-	Sequence* scrollGround = Sequence::create(MoveTo::create(groundTexSize.width / MAP_SCROLL_SPEED, Vec2(-groundTexSize.width, m_sprGround->getPositionY())),
+	Sequence* scrollGround = Sequence::create(MoveTo::create(groundTextureSize.width / MAP_SCROLL_SPEED, Vec2(-groundTextureSize.width, m_sprGround->getPositionY())),
 											  MoveTo::create(0, Vec2(0, m_sprGround->getPositionY())),
 											  NULL);
 
@@ -90,22 +84,15 @@ void Game::InitGroundAndSkyline()
 	this->addChild(m_sprGround);
 
 	// Skyline
-	m_sprSkyline = SpriteBatchNode::create("skyline.png");
-	m_sprSkyline->getTexture()->setAliasTexParameters();
-	Size skylineTexSize = m_sprSkyline->getTexture()->getContentSizeInPixels();
-	int skylineX = 0;
+	Texture2D* skylineTexture = Director::getInstance()->getTextureCache()->addImage("skyline.png");
+	Size skylineTextureSize = skylineTexture->getContentSizeInPixels();
+	skylineTexture->generateMipmap();
+	skylineTexture->setTexParameters(&texParams);
+	m_sprSkyline = Sprite::createWithTexture(skylineTexture, Rect(0, 0, visibleSize.width + skylineTextureSize.width, skylineTextureSize.height));
+	m_sprSkyline->setAnchorPoint(Vec2(0, 0));
+	m_sprSkyline->setPosition(Vec2(0, groundTextureSize.height));
 
-	do
-	{
-		Sprite* sprSkylineElement = Sprite::createWithTexture(m_sprSkyline->getTexture());
-		sprSkylineElement->setAnchorPoint(Vec2(0, 0));
-		sprSkylineElement->setPosition(skylineX, groundTexSize.height);
-		m_sprSkyline->addChild(sprSkylineElement);
-		skylineX += skylineTexSize.width;
-	} 
-	while (skylineX < visibleSize.width + skylineTexSize.width);
-
-	Sequence* scrollSkyline = Sequence::create(MoveTo::create(skylineTexSize.width / (MAP_SCROLL_SPEED >> 1), Vec2(-skylineTexSize.width, m_sprSkyline->getPositionY())),
+	Sequence* scrollSkyline = Sequence::create(MoveTo::create(skylineTextureSize.width / (MAP_SCROLL_SPEED >> 1), Vec2(-skylineTextureSize.width, m_sprSkyline->getPositionY())),
 											   MoveTo::create(0, Vec2(0, m_sprSkyline->getPositionY())),
 											   NULL);
 
@@ -113,10 +100,10 @@ void Game::InitGroundAndSkyline()
 	this->addChild(m_sprSkyline);
 
 	// Ground collision
-	PhysicsBody* body = PhysicsBody::createEdgeBox(Size(visibleSize.width, groundTexSize.height));
+	PhysicsBody* body = PhysicsBody::createEdgeBox(Size(visibleSize.width, groundTextureSize.height));
 	body->setContactTestBitmask(0xFFFFFFFF);
 	Node* edgeNode = Node::create();
-	edgeNode->setPosition(Point(visibleSize.width / 2, groundTexSize.height / 2));
+	edgeNode->setPosition(Point(visibleSize.width / 2, groundTextureSize.height / 2));
 	edgeNode->setPhysicsBody(body);
 	this->addChild(edgeNode);
 }
@@ -201,7 +188,7 @@ void Game::GeneratePipes(float dt)
 			int frameHeight = m_sprPipe[i]->getTextureRect().size.height;
 
 			// Random pipe length
-			int height = frameHeight - rand() % (frameHeight >> 1);
+			int height = (frameHeight >> 2) + rand() % (frameHeight >> 1);
 			int maxHeight = (visibleSize.height - m_sprGround->getTexture()->getContentSize().height - (m_sprBird->getTextureRect().size.height * 4));
 			height = (height > maxHeight ? maxHeight : height);
 

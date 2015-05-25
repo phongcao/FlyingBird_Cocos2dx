@@ -25,8 +25,8 @@ private:
 
 	// Sprites
 	Sprite* m_sprBird;
-	SpriteBatchNode* m_sprSkyline;
-	SpriteBatchNode* m_sprGround;
+	Sprite* m_sprSkyline;
+	Sprite* m_sprGround;
 	Sprite* m_sprPipe[NUM_ACTIVE_PIPES];
 
 	// Physics
